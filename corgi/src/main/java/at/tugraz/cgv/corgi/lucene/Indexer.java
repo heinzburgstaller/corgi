@@ -37,9 +37,13 @@ import org.apache.lucene.store.FSDirectory;
  */
 public class Indexer {
 
-  private final IndexWriter writer;
+  private final String indexPath;
 
-  public Indexer(String indexPath, boolean create) throws IOException {
+  public Indexer(String indexPath) throws IOException {
+    this.indexPath = indexPath;
+  }
+
+  public void index(String txtPath, boolean create) throws IOException {
     Directory dir = FSDirectory.open(Paths.get(indexPath));
     Analyzer analyzer = new StandardAnalyzer();
     IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
@@ -53,10 +57,7 @@ public class Indexer {
       iwc.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
     }
 
-    writer = new IndexWriter(dir, iwc);
-  }
-
-  public void index(String txtPath) throws IOException {
+    IndexWriter writer = new IndexWriter(dir, iwc);
     indexDocs(writer, Paths.get(txtPath));
     writer.close();
   }

@@ -25,9 +25,9 @@ public class IndexerTest {
     try {
       Path tempIndex = Files.createTempDirectory("corgi_");
       System.out.println("Temp Index Dir: " + tempIndex.toString());
-      Indexer indexer = new Indexer(tempIndex.toString(), true);
+      Indexer indexer = new Indexer(tempIndex.toString());
       File resourcesDirectory = new File("src/test/resources");
-      indexer.index(resourcesDirectory.getAbsolutePath());
+      indexer.index(resourcesDirectory.getAbsolutePath(), true);
     } catch (IOException ex) {
       throw new RuntimeException(ex);
     }
