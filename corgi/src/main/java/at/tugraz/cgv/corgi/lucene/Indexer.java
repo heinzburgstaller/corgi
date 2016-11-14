@@ -39,7 +39,7 @@ public class Indexer {
 
   private final String indexPath;
 
-  public Indexer(String indexPath) throws IOException {
+  public Indexer(String indexPath) {
     this.indexPath = indexPath;
   }
 
@@ -57,9 +57,9 @@ public class Indexer {
       iwc.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
     }
 
-    IndexWriter writer = new IndexWriter(dir, iwc);
-    indexDocs(writer, Paths.get(txtPath));
-    writer.close();
+    try (IndexWriter writer = new IndexWriter(dir, iwc)) {
+      indexDocs(writer, Paths.get(txtPath));
+    }
   }
 
   /**
@@ -79,7 +79,7 @@ public class Indexer {
    * files to index
    * @throws IOException If there is a low-level I/O error
    */
-  static void indexDocs(final IndexWriter writer, Path path) throws IOException {
+  private void indexDocs(final IndexWriter writer, Path path) throws IOException {
     if (Files.isDirectory(path)) {
       Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
         @Override
@@ -100,7 +100,7 @@ public class Indexer {
   /**
    * Indexes a single document
    */
-  static void indexDoc(IndexWriter writer, Path file, long lastModified) throws IOException {
+  private void indexDoc(IndexWriter writer, Path file, long lastModified) throws IOException {
     try (InputStream stream = Files.newInputStream(file)) {
       // make a new, empty document
       Document doc = new Document();
