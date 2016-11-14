@@ -37,9 +37,13 @@ import org.apache.lucene.store.FSDirectory;
  */
 public class Indexer {
 
-  private final IndexWriter writer;
+  private final String indexPath;
 
-  public Indexer(String indexPath, boolean create) throws IOException {
+  public Indexer(String indexPath) {
+    this.indexPath = indexPath;
+  }
+
+  public void index(String txtPath, boolean create) throws IOException {
     Directory dir = FSDirectory.open(Paths.get(indexPath));
     Analyzer analyzer = new StandardAnalyzer();
     IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
@@ -53,12 +57,9 @@ public class Indexer {
       iwc.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
     }
 
-    writer = new IndexWriter(dir, iwc);
-  }
-
-  public void index(String txtPath) throws IOException {
-    indexDocs(writer, Paths.get(txtPath));
-    writer.close();
+    try (IndexWriter writer = new IndexWriter(dir, iwc)) {
+      indexDocs(writer, Paths.get(txtPath));
+    }
   }
 
   /**
@@ -78,7 +79,7 @@ public class Indexer {
    * files to index
    * @throws IOException If there is a low-level I/O error
    */
-  static void indexDocs(final IndexWriter writer, Path path) throws IOException {
+  private void indexDocs(final IndexWriter writer, Path path) throws IOException {
     if (Files.isDirectory(path)) {
       Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
         @Override
@@ -99,7 +100,7 @@ public class Indexer {
   /**
    * Indexes a single document
    */
-  static void indexDoc(IndexWriter writer, Path file, long lastModified) throws IOException {
+  private void indexDoc(IndexWriter writer, Path file, long lastModified) throws IOException {
     try (InputStream stream = Files.newInputStream(file)) {
       // make a new, empty document
       Document doc = new Document();

@@ -9,27 +9,29 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import org.apache.lucene.queryparser.classic.ParseException;
 import org.junit.Test;
 
 /**
  *
  * @author heinz
  */
-public class IndexerTest {
-
-  public IndexerTest() {
-  }
+public class SearcherTest {
 
   @Test
-  public void testCreateNewIndex() {
+  public void testSearch() {
     try {
       Path tempIndex = Files.createTempDirectory("corgi_");
       System.out.println("Temp Index Dir: " + tempIndex.toString());
       Indexer indexer = new Indexer(tempIndex.toString());
       File resourcesDirectory = new File("src/test/resources");
       indexer.index(resourcesDirectory.getAbsolutePath(), true);
-    } catch (IOException ex) {
+
+      Searcher searcher = new Searcher(tempIndex.toString());
+      searcher.search("Sahil OR Ramesh");
+    } catch (IOException | ParseException ex) {
       throw new RuntimeException(ex);
     }
   }
+
 }
