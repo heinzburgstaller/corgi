@@ -8,6 +8,7 @@ package at.tugraz.cgv.corgi;
 import at.tugraz.cgv.corgi.gui.MainFrame;
 import java.awt.EventQueue;
 import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 /**
  *
@@ -32,7 +33,7 @@ public class Starter {
           break;
         }
       }
-    } catch (Exception e) {
+    } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | UnsupportedLookAndFeelException e) {
       // If Nimbus is not available, you can set the GUI to another look and feel.
     }
   }

@@ -37,4 +37,12 @@ public class PropertyLoader {
     return getPath("index_path");
   }
 
+  public static String getTxtPath() {
+    return getPath("txt_path");
+  }
+
+  public static String getImagePath() {
+    return getPath("image_path");
+  }
+
 }
