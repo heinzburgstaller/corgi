@@ -19,25 +19,25 @@ import javax.swing.UnsupportedLookAndFeelException;
  */
 public class Starter {
 
-    public static void main(String[] args) {
-        setNimbus();
- 
-        EventQueue.invokeLater(() -> {
-            MainFrame mainFrame = new MainFrame();
-            mainFrame.setVisible(true);
-        });
-    }
+  public static void main(String[] args) {
+    setNimbus();
 
-    public static void setNimbus() {
-        try {
-            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | UnsupportedLookAndFeelException e) {
-            // If Nimbus is not available, you can set the GUI to another look and feel.
+    EventQueue.invokeLater(() -> {
+      MainFrame mainFrame = new MainFrame();
+      mainFrame.setVisible(true);
+    });
+  }
+
+  public static void setNimbus() {
+    try {
+      for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+        if ("Nimbus".equals(info.getName())) {
+          UIManager.setLookAndFeel(info.getClassName());
+          break;
         }
+      }
+    } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | UnsupportedLookAndFeelException e) {
+      // If Nimbus is not available, you can set the GUI to another look and feel.
     }
+  }
 }

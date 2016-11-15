@@ -7,7 +7,6 @@ package at.tugraz.cgv.corgi.gui;
 
 import java.awt.Cursor;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 /**
@@ -16,6 +15,9 @@ import javax.swing.JTabbedPane;
  */
 public class MainFrame extends JFrame {
 
+  private SetupPanel setupPanel;
+  private SearchPanel searchPanel;
+
   public MainFrame() {
     initUI();
     initTabbedPanel();
@@ -23,8 +25,11 @@ public class MainFrame extends JFrame {
 
   private void initTabbedPanel() {
     JTabbedPane tabpanel = new JTabbedPane(JTabbedPane.TOP, JTabbedPane.SCROLL_TAB_LAYOUT);
-    tabpanel.add("Setup", new SetupPanel());
-    tabpanel.add("Search", new SearchPanel());
+    setupPanel = new SetupPanel();
+    searchPanel = new SearchPanel();
+
+    tabpanel.add("Setup", setupPanel);
+    tabpanel.add("Search", searchPanel);
     this.add(tabpanel);
   }
 
@@ -41,6 +46,14 @@ public class MainFrame extends JFrame {
 
   public void setDefaultCursor() {
     setCursor(Cursor.getDefaultCursor());
+  }
+
+  public SetupPanel getSetupPanel() {
+    return setupPanel;
+  }
+
+  public SearchPanel getSearchPanel() {
+    return searchPanel;
   }
 
 }

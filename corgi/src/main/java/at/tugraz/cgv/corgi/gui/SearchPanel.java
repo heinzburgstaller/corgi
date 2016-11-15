@@ -8,7 +8,6 @@ package at.tugraz.cgv.corgi.gui;
 import at.tugraz.cgv.corgi.gui.model.SearchTableModel;
 import at.tugraz.cgv.corgi.lucene.SearchHit;
 import at.tugraz.cgv.corgi.lucene.Searcher;
-import at.tugraz.cgv.corgi.util.PropertyLoader;
 import java.awt.BorderLayout;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -60,9 +59,10 @@ public class SearchPanel extends JPanel {
   }
 
   private void btnSearchClicked() {
-    Searcher searcher = new Searcher(PropertyLoader.getIndexPath());
+
     try {
       MainFrame mf = (MainFrame) getTopLevelAncestor();
+      Searcher searcher = new Searcher(mf.getSetupPanel().getIndexPath());
       mf.setBusyCursor();
       List<SearchHit> result = new ArrayList<>();
       if (txtSearch.getText().trim().length() > 0) {

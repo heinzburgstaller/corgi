@@ -33,6 +33,7 @@ public class SetupPanel extends JPanel {
   private final JButton btnChooseIndexPath;
   private final JButton btnExtract;
   private final JButton btnIndex;
+  private final JButton btnExtractAndIndex;
 
   public SetupPanel() {
     tfPdfPath = new JTextField(PropertyLoader.getPdfPath(), 20);
@@ -46,6 +47,7 @@ public class SetupPanel extends JPanel {
     btnChooseIndexPath = new JButton("Choose...");
     btnExtract = new JButton("Extract!");
     btnIndex = new JButton("Index!");
+    btnExtractAndIndex = new JButton("Extract and index!");
 
     setLayout(new GridBagLayout());
 
@@ -62,6 +64,7 @@ public class SetupPanel extends JPanel {
     addItem(new JLabel("Index Path:"), 0, 2, 1, 1, GridBagConstraints.EAST);
     addItem(tfIndexPath, 1, 2, 1, 1, GridBagConstraints.WEST);
     addItem(btnChooseIndexPath, 2, 2, 1, 1, GridBagConstraints.WEST);
+    addItem(btnExtractAndIndex, 3, 2, 1, 1, GridBagConstraints.WEST);
 
     btnChoosePdfPath.addActionListener((e) -> {
       String path = choosePath();
@@ -104,6 +107,21 @@ public class SetupPanel extends JPanel {
         mf.setDefaultCursor();
       }
     });
+
+    btnExtractAndIndex.addActionListener((e) -> {
+      MainFrame mf = (MainFrame) getTopLevelAncestor();
+      mf.setBusyCursor();
+      Extractor extractor = new Extractor(tfPdfPath.getText());
+      extractor.extractText(tfTxtPath.getText());
+      Indexer indexer = new Indexer(tfIndexPath.getText());
+      try {
+        indexer.index(tfTxtPath.getText(), true);
+      } catch (IOException ex) {
+        ex.printStackTrace();
+      } finally {
+        mf.setDefaultCursor();
+      }
+    });
   }
 
   private String choosePath() {
@@ -131,6 +149,10 @@ public class SetupPanel extends JPanel {
     gc.anchor = align;
     gc.fill = GridBagConstraints.NONE;
     add(c, gc);
+  }
+
+  public String getIndexPath() {
+    return tfIndexPath.getText();
   }
 
 }
