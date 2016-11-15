@@ -30,7 +30,7 @@ public class MainFrame extends JFrame {
 
   private void initUI() {
     setTitle("Corgi GUI");
-    setSize(600, 400);
+    setSize(600, 540);
     setLocationRelativeTo(null);
     setDefaultCloseOperation(EXIT_ON_CLOSE);
   }

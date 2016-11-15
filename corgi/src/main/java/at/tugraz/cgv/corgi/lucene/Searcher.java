@@ -46,7 +46,7 @@ public class Searcher {
     QueryParser parser = new QueryParser("contents", analyzer);
     Query query = parser.parse(queryString);
 
-    TopDocs results = searcher.search(query, 10);
+    TopDocs results = searcher.search(query, 1000);
     ScoreDoc[] hits = results.scoreDocs;
 
     //int numTotalHits = results.totalHits;
