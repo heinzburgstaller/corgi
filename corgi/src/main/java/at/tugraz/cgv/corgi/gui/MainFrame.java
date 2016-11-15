@@ -5,7 +5,7 @@
  */
 package at.tugraz.cgv.corgi.gui;
 
-import at.tugraz.cgv.corgi.util.PropertyLoader;
+import java.awt.Cursor;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
@@ -16,30 +16,33 @@ import javax.swing.JTabbedPane;
  */
 public class MainFrame extends JFrame {
 
-    JPanel jpextract;
-    JPanel jpsearch = new JPanel();
+  JPanel jpsearch = new JPanel();
 
-    public MainFrame() {
-        initUI();
-        initTabbedPanel();
-    }
+  public MainFrame() {
+    initUI();
+    initTabbedPanel();
+  }
 
-    private void initTabbedPanel() {
-        JTabbedPane tabpanel = new JTabbedPane(JTabbedPane.TOP, JTabbedPane.SCROLL_TAB_LAYOUT);
-        
-        jpextract = new ExtractPanel(PropertyLoader.getTxtPath());
-        //TODO: create Panel for search
-        
-        tabpanel.add("Extract", jpextract);
-        tabpanel.add("Search", jpsearch);
-        this.add(tabpanel);
-    }
+  private void initTabbedPanel() {
+    JTabbedPane tabpanel = new JTabbedPane(JTabbedPane.TOP, JTabbedPane.SCROLL_TAB_LAYOUT);
+    tabpanel.add("Setup", new SetupPanel());
+    tabpanel.add("Search", jpsearch);
+    this.add(tabpanel);
+  }
 
-    private void initUI() {
-        setTitle("Corgi GUI");
-        setSize(300, 200);
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-    }
+  private void initUI() {
+    setTitle("Corgi GUI");
+    setSize(600, 400);
+    setLocationRelativeTo(null);
+    setDefaultCloseOperation(EXIT_ON_CLOSE);
+  }
+
+  public void setBusyCursor() {
+    setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+  }
+
+  public void setDefaultCursor() {
+    setCursor(Cursor.getDefaultCursor());
+  }
 
 }
