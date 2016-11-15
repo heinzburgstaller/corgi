@@ -32,7 +32,7 @@ public class SearchPanel extends JPanel {
   private JButton btnSearch;
   private JScrollPane scrollPane;
   private JTable table;
-  private SearchTableModel model = new SearchTableModel();
+  private final SearchTableModel model = new SearchTableModel();
 
   public SearchPanel() {
     initUI();
