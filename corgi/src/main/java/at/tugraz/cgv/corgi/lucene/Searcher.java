@@ -5,8 +5,11 @@
  */
 package at.tugraz.cgv.corgi.lucene;
 
+;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -24,6 +27,8 @@ import org.apache.lucene.store.FSDirectory;
  *
  * @author heinz
  */
+
+
 public class Searcher {
 
   private final String indexPath;
@@ -32,7 +37,8 @@ public class Searcher {
     this.indexPath = indexPath;
   }
 
-  public void search(String queryString) throws IOException, ParseException {
+  public List<SearchHit> search(String queryString) throws IOException, ParseException {
+    List<SearchHit> result = new ArrayList<>();
     IndexReader reader = DirectoryReader.open(FSDirectory.open(Paths.get(indexPath)));
     IndexSearcher searcher = new IndexSearcher(reader);
     Analyzer analyzer = new StandardAnalyzer();
@@ -43,14 +49,18 @@ public class Searcher {
     TopDocs results = searcher.search(query, 10);
     ScoreDoc[] hits = results.scoreDocs;
 
-    int numTotalHits = results.totalHits;
-    System.out.println(numTotalHits + " total matching documents");
-
+    //int numTotalHits = results.totalHits;
+    //System.out.println(numTotalHits + " total matching documents");
     for (ScoreDoc scoreDoc : hits) {
+      SearchHit hit = new SearchHit();
       Document doc = searcher.doc(scoreDoc.doc);
       String path = doc.get("path");
-      System.out.println("Doc: " + path + ", score: " + scoreDoc.score);
+      hit.setFilename(path);
+      hit.setScore(new Double(scoreDoc.score));
+      result.add(hit);
     }
+
+    return result;
   }
 
 }

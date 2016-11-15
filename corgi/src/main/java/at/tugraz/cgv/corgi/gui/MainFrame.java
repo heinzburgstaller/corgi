@@ -16,8 +16,6 @@ import javax.swing.JTabbedPane;
  */
 public class MainFrame extends JFrame {
 
-  JPanel jpsearch = new JPanel();
-
   public MainFrame() {
     initUI();
     initTabbedPanel();
@@ -26,7 +24,7 @@ public class MainFrame extends JFrame {
   private void initTabbedPanel() {
     JTabbedPane tabpanel = new JTabbedPane(JTabbedPane.TOP, JTabbedPane.SCROLL_TAB_LAYOUT);
     tabpanel.add("Setup", new SetupPanel());
-    tabpanel.add("Search", jpsearch);
+    tabpanel.add("Search", new SearchPanel());
     this.add(tabpanel);
   }
 

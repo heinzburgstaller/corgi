@@ -9,7 +9,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import org.apache.lucene.queryparser.classic.ParseException;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -28,7 +30,13 @@ public class SearcherTest {
       indexer.index(resourcesDirectory.getAbsolutePath(), true);
 
       Searcher searcher = new Searcher(tempIndex.toString());
-      searcher.search("Sahil OR Ramesh");
+      List<SearchHit> searchResult = searcher.search("Sahil OR Ramesh");
+      Assert.assertTrue(searchResult.size() > 0);
+
+      searchResult.forEach(item -> {
+        System.out.println(item.getFilename() + ": " + item.getScore());
+      });
+
     } catch (IOException | ParseException ex) {
       throw new RuntimeException(ex);
     }
