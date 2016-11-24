@@ -8,13 +8,18 @@ package at.tugraz.cgv.corgi.gui;
 import at.tugraz.cgv.corgi.gui.model.SearchTableModel;
 import at.tugraz.cgv.corgi.lucene.SearchHit;
 import at.tugraz.cgv.corgi.lucene.Searcher;
+import at.tugraz.cgv.corgi.lucene.Searcher.Ranking;
 import java.awt.BorderLayout;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -31,7 +36,14 @@ public class SearchPanel extends JPanel {
   private JButton btnSearch;
   private JScrollPane scrollPane;
   private JTable table;
+  private JPanel jpranking;
   private final SearchTableModel model = new SearchTableModel();
+  JRadioButton rankDefault = new JRadioButton("Default(TFIDF)");
+  JRadioButton rankAbsolute = new JRadioButton("Absolute Occurences");
+  JRadioButton rankbm25 = new JRadioButton("BM25");
+  Searcher searcher;
+  
+  Searcher.Ranking rank = Ranking.DEFAULT;
 
   public SearchPanel() {
     initUI();
@@ -49,9 +61,33 @@ public class SearchPanel extends JPanel {
 
     actionPanel.add(txtSearch);
     actionPanel.add(btnSearch);
-
+    
+    jpranking = new JPanel();
+    jpranking.setLayout(new GridLayout(3,1));
+    jpranking.add(rankDefault);
+    jpranking.add(rankAbsolute);
+    jpranking.add(rankbm25);
+    
+    rankDefault.setSelected(true);
+    
+    ButtonGroup group = new ButtonGroup();
+    group.add(rankDefault);
+    group.add(rankAbsolute);
+    group.add(rankbm25);
+    
+    rankDefault.addActionListener((ActionEvent e) -> {
+      rank = Searcher.Ranking.DEFAULT;
+    });
+    rankAbsolute.addActionListener((ActionEvent e) -> {
+      rank = Searcher.Ranking.ABSOLUTE;
+    });
+    rankbm25.addActionListener((ActionEvent e) -> {
+      rank = Searcher.Ranking.BM25;
+    });
+    
     add(actionPanel, BorderLayout.NORTH);
     add(scrollPane, BorderLayout.CENTER);
+    add(jpranking, BorderLayout.SOUTH);
 
     btnSearch.addActionListener(a -> {
       btnSearchClicked();
@@ -62,7 +98,7 @@ public class SearchPanel extends JPanel {
 
     try {
       MainFrame mf = (MainFrame) getTopLevelAncestor();
-      Searcher searcher = new Searcher(mf.getSetupPanel().getIndexPath());
+      searcher = new Searcher(mf.getSetupPanel().getIndexPath(), rank);
       mf.setBusyCursor();
       List<SearchHit> result = new ArrayList<>();
       if (txtSearch.getText().trim().length() > 0) {

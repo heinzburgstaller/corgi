@@ -21,7 +21,11 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.search.similarities.BM25Similarity;
+import org.apache.lucene.search.similarities.ClassicSimilarity;
 import org.apache.lucene.store.FSDirectory;
+        //
+
 
 /**
  *
@@ -32,9 +36,19 @@ import org.apache.lucene.store.FSDirectory;
 public class Searcher {
 
   private final String indexPath;
+  private Ranking ranking = Ranking.DEFAULT;
 
-  public Searcher(String indexPath) {
+  public Searcher(String indexPath, Ranking rank) {
     this.indexPath = indexPath;
+    this.ranking = rank;
+  }
+  
+  public enum Ranking {
+    DEFAULT, ABSOLUTE, BM25 
+  }
+  
+  public void setRankingMode(Ranking rank){
+    ranking = rank;
   }
 
   public List<SearchHit> search(String queryString) throws IOException, ParseException {
@@ -46,9 +60,21 @@ public class Searcher {
     QueryParser parser = new QueryParser("contents", analyzer);
     Query query = parser.parse(queryString);
 
+    switch(ranking){
+            case DEFAULT:
+              searcher.setSimilarity(new ClassicSimilarity());
+              break;
+            case ABSOLUTE:
+              searcher.setSimilarity(new CustomScoringAbsoluteNumber());
+              break;
+            case BM25:
+              searcher.setSimilarity(new BM25Similarity());
+              break;
+    }
+    
     TopDocs results = searcher.search(query, 100);
     ScoreDoc[] hits = results.scoreDocs;
-
+    
     //int numTotalHits = results.totalHits;
     //System.out.println(numTotalHits + " total matching documents");
     for (ScoreDoc scoreDoc : hits) {
@@ -58,8 +84,14 @@ public class Searcher {
       hit.setFilename(path);
       hit.setScore(new Double(scoreDoc.score));
       result.add(hit);
+      //Explanation expl = searcher.explain(query, scoreDoc.doc);
+      //System.out.println(expl.toString());
     }
 
+    
+    
+    
+    
     return result;
   }
 

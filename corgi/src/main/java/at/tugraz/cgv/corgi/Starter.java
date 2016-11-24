@@ -6,10 +6,7 @@
 package at.tugraz.cgv.corgi;
 
 import at.tugraz.cgv.corgi.gui.MainFrame;
-import at.tugraz.cgv.corgi.util.PropertyLoader;
 import java.awt.EventQueue;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
