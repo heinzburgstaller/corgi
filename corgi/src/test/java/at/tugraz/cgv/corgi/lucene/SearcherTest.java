@@ -29,7 +29,7 @@ public class SearcherTest {
       File resourcesDirectory = new File("src/test/resources");
       indexer.index(resourcesDirectory.getAbsolutePath(), true);
 
-      Searcher searcher = new Searcher(tempIndex.toString());
+      Searcher searcher = new Searcher(tempIndex.toString(), Searcher.Ranking.DEFAULT);
       List<SearchHit> searchResult = searcher.search("Sahil OR Ramesh");
       Assert.assertTrue(searchResult.size() > 0);
 
