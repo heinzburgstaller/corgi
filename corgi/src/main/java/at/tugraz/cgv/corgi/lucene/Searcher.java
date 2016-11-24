@@ -24,8 +24,7 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.similarities.BM25Similarity;
 import org.apache.lucene.search.similarities.ClassicSimilarity;
 import org.apache.lucene.store.FSDirectory;
-        //
-
+//
 
 /**
  *
@@ -42,12 +41,12 @@ public class Searcher {
     this.indexPath = indexPath;
     this.ranking = rank;
   }
-  
+
   public enum Ranking {
-    DEFAULT, ABSOLUTE, BM25 
+    DEFAULT, ABSOLUTE, BM25, CUSTOM_TFIDF
   }
-  
-  public void setRankingMode(Ranking rank){
+
+  public void setRankingMode(Ranking rank) {
     ranking = rank;
   }
 
@@ -60,21 +59,24 @@ public class Searcher {
     QueryParser parser = new QueryParser("contents", analyzer);
     Query query = parser.parse(queryString);
 
-    switch(ranking){
-            case DEFAULT:
-              searcher.setSimilarity(new ClassicSimilarity());
-              break;
-            case ABSOLUTE:
-              searcher.setSimilarity(new CustomScoringAbsoluteNumber());
-              break;
-            case BM25:
-              searcher.setSimilarity(new BM25Similarity());
-              break;
+    switch (ranking) {//TFIDFSimilarity
+      case DEFAULT:
+        searcher.setSimilarity(new ClassicSimilarity());
+        break;
+      case CUSTOM_TFIDF:
+        searcher.setSimilarity(new CustomScoringIgnoreCommon());
+        break;
+      case ABSOLUTE:
+        searcher.setSimilarity(new CustomScoringAbsoluteNumber());
+        break;
+      case BM25:
+        searcher.setSimilarity(new BM25Similarity());
+        break;
     }
-    
+
     TopDocs results = searcher.search(query, 100);
     ScoreDoc[] hits = results.scoreDocs;
-    
+
     //int numTotalHits = results.totalHits;
     //System.out.println(numTotalHits + " total matching documents");
     for (ScoreDoc scoreDoc : hits) {
@@ -88,10 +90,6 @@ public class Searcher {
       //System.out.println(expl.toString());
     }
 
-    
-    
-    
-    
     return result;
   }
 

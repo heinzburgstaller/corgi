@@ -41,6 +41,7 @@ public class SearchPanel extends JPanel {
   JRadioButton rankDefault = new JRadioButton("Default(TFIDF)");
   JRadioButton rankAbsolute = new JRadioButton("Absolute Occurences");
   JRadioButton rankbm25 = new JRadioButton("BM25");
+  JRadioButton rankctfidf = new JRadioButton("Custom TFIDF");
   Searcher searcher;
   
   Searcher.Ranking rank = Ranking.DEFAULT;
@@ -67,6 +68,7 @@ public class SearchPanel extends JPanel {
     jpranking.add(rankDefault);
     jpranking.add(rankAbsolute);
     jpranking.add(rankbm25);
+    jpranking.add(rankctfidf);
     
     rankDefault.setSelected(true);
     
@@ -74,6 +76,7 @@ public class SearchPanel extends JPanel {
     group.add(rankDefault);
     group.add(rankAbsolute);
     group.add(rankbm25);
+    group.add(rankctfidf);
     
     rankDefault.addActionListener((ActionEvent e) -> {
       rank = Searcher.Ranking.DEFAULT;
@@ -83,6 +86,9 @@ public class SearchPanel extends JPanel {
     });
     rankbm25.addActionListener((ActionEvent e) -> {
       rank = Searcher.Ranking.BM25;
+    });
+    rankctfidf.addActionListener((ActionEvent e) -> {
+      rank = Searcher.Ranking.CUSTOM_TFIDF;
     });
     
     add(actionPanel, BorderLayout.NORTH);
