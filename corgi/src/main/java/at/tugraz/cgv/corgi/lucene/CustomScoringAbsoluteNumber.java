@@ -5,7 +5,6 @@
  */
 package at.tugraz.cgv.corgi.lucene;
 
-
 import org.apache.lucene.index.FieldInvertState;
 import org.apache.lucene.search.similarities.TFIDFSimilarity;
 import org.apache.lucene.util.BytesRef;
@@ -14,7 +13,7 @@ import org.apache.lucene.util.BytesRef;
  *
  * @author sbuersch
  */
-public class CustomScoringAbsoluteNumber extends TFIDFSimilarity{
+public class CustomScoringAbsoluteNumber extends TFIDFSimilarity {
 
   @Override
   public float coord(int i, int i1) {
@@ -59,5 +58,5 @@ public class CustomScoringAbsoluteNumber extends TFIDFSimilarity{
   @Override
   public float scorePayload(int i, int i1, int i2, BytesRef br) {
     return 1;
-  } 
+  }
 }

@@ -43,7 +43,7 @@ public class SearchPanel extends JPanel {
   JRadioButton rankbm25 = new JRadioButton("BM25");
   JRadioButton rankctfidf = new JRadioButton("Custom TFIDF");
   Searcher searcher;
-  
+
   Searcher.Ranking rank = Ranking.DEFAULT;
 
   public SearchPanel() {
@@ -63,22 +63,22 @@ public class SearchPanel extends JPanel {
 
     actionPanel.add(txtSearch);
     actionPanel.add(btnSearch);
-    
+
     jpranking = new JPanel();
-    jpranking.setLayout(new GridLayout(3,1));
+    jpranking.setLayout(new GridLayout(3, 1));
     jpranking.add(rankDefault);
     jpranking.add(rankAbsolute);
     jpranking.add(rankbm25);
     jpranking.add(rankctfidf);
-    
+
     rankDefault.setSelected(true);
-    
+
     ButtonGroup group = new ButtonGroup();
     group.add(rankDefault);
     group.add(rankAbsolute);
     group.add(rankbm25);
     group.add(rankctfidf);
-    
+
     rankDefault.addActionListener((ActionEvent e) -> {
       rank = Searcher.Ranking.DEFAULT;
     });
@@ -91,7 +91,7 @@ public class SearchPanel extends JPanel {
     rankctfidf.addActionListener((ActionEvent e) -> {
       rank = Searcher.Ranking.CUSTOM_TFIDF;
     });
-    
+
     add(actionPanel, BorderLayout.NORTH);
     add(scrollPane, BorderLayout.CENTER);
     add(jpranking, BorderLayout.SOUTH);

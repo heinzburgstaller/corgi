@@ -17,9 +17,9 @@ public class CustomScoringIgnoreCommon extends SimilarityBase {
 
   @Override
   protected float score(BasicStats bs, float f, float f1) {
-    float idf = (float) (1 + log2(bs.getNumberOfDocuments()/(1+bs.getDocFreq())));
+    float idf = (float) (1 + log2(bs.getNumberOfDocuments() / (1 + bs.getDocFreq())));
     float tf = (float) Math.sqrt(f);
- 
+
     return idf * tf;
   }
 
