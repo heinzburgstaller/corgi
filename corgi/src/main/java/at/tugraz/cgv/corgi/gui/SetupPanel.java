@@ -8,10 +8,15 @@ package at.tugraz.cgv.corgi.gui;
 import at.tugraz.cgv.corgi.Extractor;
 import at.tugraz.cgv.corgi.lucene.Indexer;
 import at.tugraz.cgv.corgi.util.PropertyLoader;
+import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
@@ -25,6 +30,7 @@ import javax.swing.JTextField;
  */
 public class SetupPanel extends JPanel {
 
+  private final JPanel setupPanel;
   private final JTextField tfPdfPath;
   private final JTextField tfTxtPath;
   private final JTextField tfIndexPath;
@@ -36,6 +42,16 @@ public class SetupPanel extends JPanel {
   private final JButton btnExtractAndIndex;
 
   public SetupPanel() {
+    super(new BorderLayout());
+    BufferedImage image = null;
+    try {
+      ClassLoader classLoader = getClass().getClassLoader();
+      File file = new File(classLoader.getResource("Logo.png").getFile());
+      image = ImageIO.read(file);
+    } catch (IOException ex) {
+      ex.printStackTrace();
+    }
+    JLabel picLabel = new JLabel(new ImageIcon(image));
     tfPdfPath = new JTextField(PropertyLoader.getPdfPath(), 20);
     tfTxtPath = new JTextField(PropertyLoader.getTxtPath(), 20);
     tfIndexPath = new JTextField(PropertyLoader.getIndexPath(), 20);
@@ -49,7 +65,7 @@ public class SetupPanel extends JPanel {
     btnIndex = new JButton("Index!");
     btnExtractAndIndex = new JButton("Extract and index!");
 
-    setLayout(new GridBagLayout());
+    setupPanel = new JPanel(new GridBagLayout());
 
     addItem(new JLabel("PDF Path:"), 0, 0, 1, 1, GridBagConstraints.EAST);
     addItem(tfPdfPath, 1, 0, 1, 1, GridBagConstraints.WEST);
@@ -65,6 +81,9 @@ public class SetupPanel extends JPanel {
     addItem(tfIndexPath, 1, 2, 1, 1, GridBagConstraints.WEST);
     addItem(btnChooseIndexPath, 2, 2, 1, 1, GridBagConstraints.WEST);
     addItem(btnExtractAndIndex, 3, 2, 1, 1, GridBagConstraints.WEST);
+
+    add(picLabel, BorderLayout.NORTH);
+    add(setupPanel, BorderLayout.CENTER);
 
     btnChoosePdfPath.addActionListener((e) -> {
       String path = choosePath();
@@ -148,7 +167,7 @@ public class SetupPanel extends JPanel {
     gc.insets = new Insets(5, 5, 5, 5);
     gc.anchor = align;
     gc.fill = GridBagConstraints.NONE;
-    add(c, gc);
+    setupPanel.add(c, gc);
   }
 
   public String getIndexPath() {
