@@ -51,7 +51,7 @@ public class ImageItem {
   }
 
   public String getDocumentName() {
-    return "doc.txt";
+    return filename.replaceAll("_[0-9][0-9][0-9].jpg", ".txt");
   }
 
 }
