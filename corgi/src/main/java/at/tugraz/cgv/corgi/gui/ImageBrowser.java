@@ -4,6 +4,7 @@ import at.tugraz.cgv.corgi.gui.event.ImageSelectEvent;
 import at.tugraz.cgv.corgi.gui.interfaces.ImageSelectListener;
 import at.tugraz.cgv.corgi.gui.layouts.WrapLayout;
 import at.tugraz.cgv.corgi.gui.model.ImageItem;
+import java.awt.Color;
 import java.util.List;
 import javax.swing.JPanel;
 import javax.swing.event.EventListenerList;
@@ -23,7 +24,11 @@ public class ImageBrowser extends JPanel {
   protected EventListenerList imageSelectListenerList = new EventListenerList();
 
   public ImageBrowser() {
-    super(new WrapLayout());
+    //super(new FlowLayout());
+    WrapLayout fl = new WrapLayout();
+    fl.setHgap(20);
+    fl.setVgap(20);
+    this.setLayout(fl);
   }
 
   public void addImages(List<ImageItem> images) {
@@ -31,6 +36,7 @@ public class ImageBrowser extends JPanel {
     images.forEach((imageItem) -> {
       this.add(new ImageContainer(this, imageItem));
     });
+    this.setBackground(Color.lightGray);
     this.validate();
     this.repaint();
   }
