@@ -13,7 +13,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -45,9 +44,7 @@ public class SetupPanel extends JPanel {
     super(new BorderLayout());
     BufferedImage image = null;
     try {
-      ClassLoader classLoader = getClass().getClassLoader();
-      File file = new File(classLoader.getResource("Logo.png").getFile());
-      image = ImageIO.read(file);
+      image = ImageIO.read(SetupPanel.class.getResourceAsStream("/Logo.png"));
     } catch (IOException ex) {
       ex.printStackTrace();
     }
