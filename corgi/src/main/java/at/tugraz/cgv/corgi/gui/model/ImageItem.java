@@ -10,5 +10,29 @@ package at.tugraz.cgv.corgi.gui.model;
  * @author heinz
  */
 public class ImageItem {
-  
+
+  private String imagePath;
+  private String filename;
+
+  public ImageItem(String imagePath, String filename) {
+    this.imagePath = imagePath;
+    this.filename = filename;
+  }
+
+  public String getImagePath() {
+    return imagePath;
+  }
+
+  public void setImagePath(String imagePath) {
+    this.imagePath = imagePath;
+  }
+
+  public String getFilename() {
+    return filename;
+  }
+
+  public void setFilename(String filename) {
+    this.filename = filename;
+  }
+
 }

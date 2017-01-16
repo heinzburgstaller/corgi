@@ -5,7 +5,9 @@
  */
 package at.tugraz.cgv.corgi.lucene;
 
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -16,12 +18,18 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import javax.imageio.ImageIO;
+import net.semanticmetadata.lire.builders.GlobalDocumentBuilder;
+import net.semanticmetadata.lire.imageanalysis.features.global.AutoColorCorrelogram;
+import net.semanticmetadata.lire.imageanalysis.features.global.CEDD;
+import net.semanticmetadata.lire.imageanalysis.features.global.FCTH;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.document.LongPoint;
+
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.LongField;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
@@ -37,13 +45,29 @@ import org.apache.lucene.store.FSDirectory;
  */
 public class Indexer {
 
+  public final static String FIELD_FILETYPE = "filetype";
+  public final static String FIELD_FILENAME = "filename";
+  public final static String FIELD_PATH = "path";
+
+  public enum Filetype {
+    TXT, IMAGE
+  };
+
   private final String indexPath;
+  private GlobalDocumentBuilder globalDocumentBuilder;
 
   public Indexer(String indexPath) {
     this.indexPath = indexPath;
   }
 
   public void index(String txtPath, boolean create) throws IOException {
+    // Creating a CEDD document builder and indexing all files.
+    globalDocumentBuilder = new GlobalDocumentBuilder(CEDD.class);
+
+    // and here we add those features we want to extract in a single run:
+    globalDocumentBuilder.addExtractor(FCTH.class);
+    globalDocumentBuilder.addExtractor(AutoColorCorrelogram.class);
+
     Directory dir = FSDirectory.open(Paths.get(indexPath));
     Analyzer analyzer = new StandardAnalyzer();
     IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
@@ -60,6 +84,8 @@ public class Indexer {
     try (IndexWriter writer = new IndexWriter(dir, iwc)) {
       indexDocs(writer, Paths.get(txtPath));
     }
+
+    System.out.println("Indexing done!");
   }
 
   /**
@@ -85,7 +111,11 @@ public class Indexer {
         @Override
         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
           try {
-            indexDoc(writer, file, attrs.lastModifiedTime().toMillis());
+            if (file.toString().toLowerCase().endsWith(".jpg")) {
+              indexImage(writer, file, attrs.lastModifiedTime().toMillis());
+            } else {
+              indexDoc(writer, file, attrs.lastModifiedTime().toMillis());
+            }
           } catch (IOException ignore) {
             // don't index files that can't be read.
           }
@@ -93,7 +123,34 @@ public class Indexer {
         }
       });
     } else {
-      indexDoc(writer, path, Files.getLastModifiedTime(path).toMillis());
+      if (path.toString().toLowerCase().endsWith(".jpg")) {
+        indexImage(writer, path, Files.getLastModifiedTime(path).toMillis());
+      } else {
+        indexDoc(writer, path, Files.getLastModifiedTime(path).toMillis());
+      }
+    }
+  }
+
+  private void indexImage(IndexWriter writer, Path file, long lastModified) {
+    if (file.toFile().length() == 0) {
+      System.out.println("Indexing image: " + file.toString() + ", is empty -> ignore");
+      return;
+    }
+
+    System.out.println("Indexing image: " + file.toString());
+    try {
+      BufferedImage img = ImageIO.read(new FileInputStream(file.toString()));
+      Document document = globalDocumentBuilder.createDocument(img, file.toString());
+      Field filename = new StringField(FIELD_FILENAME, file.toFile().getName(), Field.Store.YES);
+      document.add(filename);
+      Field pathField = new StringField(FIELD_PATH, file.toString(), Field.Store.YES);
+      document.add(pathField);
+      Field typeField = new StringField(FIELD_FILETYPE, Filetype.IMAGE.toString(), Field.Store.YES);
+      document.add(typeField);
+      writer.addDocument(document);
+    } catch (IOException e) {
+      System.err.println("Error reading image or indexing it.");
+      e.printStackTrace();
     }
   }
 
@@ -105,12 +162,12 @@ public class Indexer {
       // make a new, empty document
       Document doc = new Document();
 
-      // Add the path of the file as a field named "path".  Use a
-      // field that is indexed (i.e. searchable), but don't tokenize 
-      // the field into separate words and don't index term frequency
-      // or positional information:
-      Field pathField = new StringField("path", file.toString(), Field.Store.YES);
+      Field filename = new StringField(FIELD_FILENAME, file.toFile().getName(), Field.Store.YES);
+      doc.add(filename);
+      Field pathField = new StringField(FIELD_PATH, file.toString(), Field.Store.YES);
       doc.add(pathField);
+      Field typeField = new StringField(FIELD_FILETYPE, Filetype.TXT.toString(), Field.Store.YES);
+      doc.add(typeField);
 
       // Add the last modified date of the file a field named "modified".
       // Use a LongPoint that is indexed (i.e. efficiently filterable with
@@ -119,8 +176,7 @@ public class Indexer {
       // year/month/day/hour/minutes/seconds, down the resolution you require.
       // For example the long value 4 would mean
       // February 17, 1, 2-3 PM.
-      doc.add(new LongPoint("modified", lastModified));
-
+      // doc.add(new LongField("modified", lastModified));
       // Add the contents of the file to a field named "contents".  Specify a Reader,
       // so that the text of the file is tokenized and indexed, but not stored.
       // Note that FileReader expects the file to be in UTF-8 encoding.

@@ -17,6 +17,7 @@ public class MainFrame extends JFrame {
 
   private SetupPanel setupPanel;
   private SearchPanel searchPanel;
+  private ImageBrowserPanel imageBrowserPanel;
 
   public MainFrame() {
     initUI();
@@ -27,9 +28,11 @@ public class MainFrame extends JFrame {
     JTabbedPane tabpanel = new JTabbedPane(JTabbedPane.TOP, JTabbedPane.SCROLL_TAB_LAYOUT);
     setupPanel = new SetupPanel();
     searchPanel = new SearchPanel();
+    imageBrowserPanel = new ImageBrowserPanel();
 
     tabpanel.add("Setup", setupPanel);
     tabpanel.add("Search", searchPanel);
+    tabpanel.add("Image Browser", imageBrowserPanel);
     this.add(tabpanel);
   }
 

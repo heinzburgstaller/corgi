@@ -5,7 +5,7 @@
  */
 package at.tugraz.cgv.corgi.lucene;
 
-;
+import at.tugraz.cgv.corgi.gui.model.ImageItem;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -15,6 +15,8 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.queries.TermsQuery;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
@@ -22,20 +24,18 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.similarities.BM25Similarity;
-import org.apache.lucene.search.similarities.ClassicSimilarity;
+import org.apache.lucene.search.similarities.DefaultSimilarity;
 import org.apache.lucene.store.FSDirectory;
-//
-
-/**
- *
- * @author heinz
- */
-
 
 public class Searcher {
 
   private final String indexPath;
   private Ranking ranking = Ranking.DEFAULT;
+
+  public Searcher(String indexPath) {
+    this.indexPath = indexPath;
+    this.ranking = Ranking.DEFAULT;
+  }
 
   public Searcher(String indexPath, Ranking rank) {
     this.indexPath = indexPath;
@@ -50,6 +50,26 @@ public class Searcher {
     ranking = rank;
   }
 
+  public List<ImageItem> findAllImages() throws IOException, ParseException {
+    List<ImageItem> list = new ArrayList<>();
+    IndexReader reader = DirectoryReader.open(FSDirectory.open(Paths.get(indexPath)));
+    IndexSearcher searcher = new IndexSearcher(reader);
+
+    Query q = new TermsQuery(new Term(Indexer.FIELD_FILETYPE, Indexer.Filetype.IMAGE.toString()));
+
+    TopDocs results = searcher.search(q, 2000);
+    ScoreDoc[] hits = results.scoreDocs;
+    for (ScoreDoc scoreDoc : hits) {
+      Document doc = searcher.doc(scoreDoc.doc);
+      String path = doc.get(Indexer.FIELD_PATH);
+      String filename = doc.get(Indexer.FIELD_FILENAME);
+      ImageItem imageItem = new ImageItem(path, filename);
+      list.add(imageItem);
+    }
+
+    return list;
+  }
+
   public List<SearchHit> search(String queryString) throws IOException, ParseException {
     List<SearchHit> result = new ArrayList<>();
     IndexReader reader = DirectoryReader.open(FSDirectory.open(Paths.get(indexPath)));
@@ -61,7 +81,7 @@ public class Searcher {
 
     switch (ranking) {//TFIDFSimilarity
       case DEFAULT:
-        searcher.setSimilarity(new ClassicSimilarity());
+        searcher.setSimilarity(new DefaultSimilarity());
         break;
       case CUSTOM_TFIDF:
         searcher.setSimilarity(new CustomScoringIgnoreCommon());

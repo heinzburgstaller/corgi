@@ -47,6 +47,7 @@ public class SearchPanel extends JPanel {
   Searcher.Ranking rank = Ranking.DEFAULT;
 
   public SearchPanel() {
+    super(new BorderLayout());
     initUI();
   }
 

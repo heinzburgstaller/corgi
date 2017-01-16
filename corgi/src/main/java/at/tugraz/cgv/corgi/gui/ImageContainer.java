@@ -40,7 +40,7 @@ public class ImageContainer extends JPanel {
     this.imageItem = imageItem;
 
     try {
-      image = ImageIO.read(new File("/home/heinz/Bilder/image.jpg"));
+      image = ImageIO.read(new File(imageItem.getImagePath()));
       JLabel picLabel = new JLabel(new ImageIcon(image.getScaledInstance(100, -1, Image.SCALE_FAST)));
       picLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
       picLabel.addMouseListener(new MouseAdapter() {
@@ -53,7 +53,7 @@ public class ImageContainer extends JPanel {
       JPanel infoPanel = new JPanel();
       infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
 
-      headline = new JLabel("image.jpg");
+      headline = new JLabel(imageItem.getFilename());
       property1 = new JLabel("Property 1: " + "value1");
       property2 = new JLabel("Property 2: " + "value2");
       property3 = new JLabel("Property 3: " + "value3");
