@@ -6,10 +6,18 @@
 package at.tugraz.cgv.corgi.lucene;
 
 import at.tugraz.cgv.corgi.gui.model.ImageItem;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import javax.imageio.ImageIO;
+import net.semanticmetadata.lire.builders.DocumentBuilder;
+import net.semanticmetadata.lire.imageanalysis.features.global.CEDD;
+import net.semanticmetadata.lire.searchers.GenericFastImageSearcher;
+import net.semanticmetadata.lire.searchers.ImageSearchHits;
+import net.semanticmetadata.lire.searchers.ImageSearcher;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -48,6 +56,36 @@ public class Searcher {
 
   public void setRankingMode(Ranking rank) {
     ranking = rank;
+  }
+
+  public List<ImageItem> findSimilarImages(String imagePath) throws IOException {
+    List<ImageItem> list = new ArrayList<>();
+    IndexReader reader = DirectoryReader.open(FSDirectory.open(Paths.get(indexPath)));
+    ImageSearcher searcher = new GenericFastImageSearcher(30, CEDD.class);
+    BufferedImage img = null;
+    File f = new File(imagePath);
+    if (f.exists()) {
+      img = ImageIO.read(f);
+    } else {
+      throw new IOException("Image does not exist!");
+    }
+
+    // searching with a image file ...
+    ImageSearchHits hits = searcher.search(img, reader);
+    // searching with a Lucene document instance ...
+    for (int i = 0; i < hits.length(); i++) {
+      Document doc = reader.document(hits.documentID(i));
+      String fileName = reader.document(hits.documentID(i))
+              .getValues(DocumentBuilder.FIELD_NAME_IDENTIFIER)[0];
+      System.out.println(hits.score(i) + ": \t" + fileName);
+
+      String path = doc.get(Indexer.FIELD_PATH);
+      String filename = doc.get(Indexer.FIELD_FILENAME);
+      ImageItem imageItem = new ImageItem(path, filename);
+      list.add(imageItem);
+    }
+
+    return list;
   }
 
   public List<ImageItem> findAllImages() throws IOException, ParseException {

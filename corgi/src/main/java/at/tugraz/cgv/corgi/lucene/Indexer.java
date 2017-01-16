@@ -29,7 +29,6 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.document.LongField;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
@@ -85,7 +84,33 @@ public class Indexer {
       indexDocs(writer, Paths.get(txtPath));
     }
 
+    Directory dirImages = FSDirectory.open(Paths.get(indexPath + "/images"));
+    Analyzer analyzerImages = new StandardAnalyzer();
+    IndexWriterConfig iwcImages = new IndexWriterConfig(analyzerImages);
+
+    try (IndexWriter writer = new IndexWriter(dirImages, iwcImages)) {
+      indexImages(writer, Paths.get(txtPath));
+    }
+
     System.out.println("Indexing done!");
+  }
+
+  private void indexImages(final IndexWriter writer, Path path) throws IOException {
+    if (Files.isDirectory(path)) {
+      Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+        @Override
+        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+          if (file.toString().toLowerCase().endsWith(".jpg")) {
+            indexImage(writer, file, attrs.lastModifiedTime().toMillis());
+          } // don't index files that can't be read.
+          return FileVisitResult.CONTINUE;
+        }
+      });
+    } else {
+      if (path.toString().toLowerCase().endsWith(".jpg")) {
+        indexImage(writer, path, Files.getLastModifiedTime(path).toMillis());
+      }
+    }
   }
 
   /**
@@ -111,9 +136,7 @@ public class Indexer {
         @Override
         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
           try {
-            if (file.toString().toLowerCase().endsWith(".jpg")) {
-              indexImage(writer, file, attrs.lastModifiedTime().toMillis());
-            } else {
+            if (!file.toString().toLowerCase().endsWith(".jpg")) {
               indexDoc(writer, file, attrs.lastModifiedTime().toMillis());
             }
           } catch (IOException ignore) {
@@ -123,9 +146,7 @@ public class Indexer {
         }
       });
     } else {
-      if (path.toString().toLowerCase().endsWith(".jpg")) {
-        indexImage(writer, path, Files.getLastModifiedTime(path).toMillis());
-      } else {
+      if (!path.toString().toLowerCase().endsWith(".jpg")) {
         indexDoc(writer, path, Files.getLastModifiedTime(path).toMillis());
       }
     }

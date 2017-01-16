@@ -5,19 +5,23 @@
  */
 package at.tugraz.cgv.corgi.gui;
 
+import at.tugraz.cgv.corgi.gui.event.ImageSelectEvent;
 import at.tugraz.cgv.corgi.gui.model.ImageItem;
 import at.tugraz.cgv.corgi.lucene.Searcher;
 import at.tugraz.cgv.corgi.util.PropertyLoader;
 import java.awt.BorderLayout;
+import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import org.apache.lucene.index.IndexNotFoundException;
 import org.apache.lucene.queryparser.classic.ParseException;
 
 /**
@@ -51,10 +55,12 @@ public class ImageBrowserPanel extends JPanel {
     navPanel.add(btnNext);
     navPanel.add(btnLast);
 
-    searcher = new Searcher(PropertyLoader.getIndexPath());
+    searcher = new Searcher(PropertyLoader.getIndexPath() + "/images");
     try {
       images = searcher.findAllImages();
       maxPages = images.size() / IMAGES_PER_PAGE;
+    } catch (IndexNotFoundException ine) {
+      System.out.println(ine.toString());
     } catch (IOException | ParseException ex) {
       throw new RuntimeException(ex);
     }
@@ -90,6 +96,20 @@ public class ImageBrowserPanel extends JPanel {
       currentPage = maxPages;
       navigate();
     });
+
+    imageBrowser.addImageSelectListener((ImageSelectEvent event) -> {
+      try {
+        MainFrame mf = (MainFrame) getTopLevelAncestor();
+        searcher = new Searcher(mf.getSetupPanel().getIndexPath() + "/images");
+        mf.setBusyCursor();
+        List<ImageItem> result = searcher.findSimilarImages(event.getImageItem().getImagePath());
+        mf.setDefaultCursor();
+
+        createFrame(result);
+      } catch (IOException ex) {
+        throw new RuntimeException(ex);
+      }
+    });
   }
 
   private void navigate() {
@@ -98,9 +118,25 @@ public class ImageBrowserPanel extends JPanel {
     if (to > images.size()) {
       to = images.size();
     }
-
     imageBrowser.addImages(images.subList(from, to));
-
     navLabel.setText("  Page " + (currentPage + 1) + " of " + (maxPages + 1) + "  ");
+  }
+
+  public static void createFrame(List<ImageItem> result) {
+    EventQueue.invokeLater(() -> {
+      JFrame frame = new JFrame("Test");
+      frame.setSize(800, 600);
+      frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+      frame.setLocationRelativeTo(null);
+
+      ImageBrowser browser = new ImageBrowser();
+      browser.addImages(result);
+
+      frame.add(new JScrollPane(browser), BorderLayout.CENTER);
+      frame.setVisible(true);
+      frame.setResizable(true);
+      frame.validate();
+      frame.repaint();
+    });
   }
 }

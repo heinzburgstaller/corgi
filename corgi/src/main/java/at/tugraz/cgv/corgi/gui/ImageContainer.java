@@ -41,7 +41,7 @@ public class ImageContainer extends JPanel {
 
     try {
       image = ImageIO.read(new File(imageItem.getImagePath()));
-      JLabel picLabel = new JLabel(new ImageIcon(image.getScaledInstance(100, -1, Image.SCALE_FAST)));
+      JLabel picLabel = new JLabel(new ImageIcon(image.getScaledInstance(200, -1, Image.SCALE_FAST)));
       picLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
       picLabel.addMouseListener(new MouseAdapter() {
         @Override
