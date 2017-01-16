@@ -10,6 +10,7 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -31,7 +32,6 @@ public class ImageContainer extends JPanel {
   private JLabel headline;
   private JLabel property1;
   private JLabel property2;
-  private JLabel property3;
   private final ImageBrowser imageBrowser;
   private final ImageItem imageItem;
 
@@ -54,13 +54,16 @@ public class ImageContainer extends JPanel {
       infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
 
       headline = new JLabel(imageItem.getFilename());
-      property1 = new JLabel("Property 1: " + "value1");
-      property2 = new JLabel("Property 2: " + "value2");
-      property3 = new JLabel("Property 3: " + "value3");
+      property1 = new JLabel("Document: " + imageItem.getDocumentName());
+
       infoPanel.add(headline);
       infoPanel.add(property1);
-      infoPanel.add(property2);
-      infoPanel.add(property3);
+      if (imageItem.getDistance() != null) {
+        DecimalFormat df = new DecimalFormat("#0.00");
+        property2 = new JLabel("Distance: " + df.format(imageItem.getDistance()));
+        infoPanel.add(property2);
+      }
+
       add(picLabel, BorderLayout.CENTER);
       add(infoPanel, BorderLayout.EAST);
     } catch (IOException ex) {

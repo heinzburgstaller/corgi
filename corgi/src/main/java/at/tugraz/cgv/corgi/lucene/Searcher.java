@@ -13,7 +13,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import javax.imageio.ImageIO;
-import net.semanticmetadata.lire.builders.DocumentBuilder;
 import net.semanticmetadata.lire.imageanalysis.features.global.CEDD;
 import net.semanticmetadata.lire.searchers.GenericFastImageSearcher;
 import net.semanticmetadata.lire.searchers.ImageSearchHits;
@@ -75,13 +74,9 @@ public class Searcher {
     // searching with a Lucene document instance ...
     for (int i = 0; i < hits.length(); i++) {
       Document doc = reader.document(hits.documentID(i));
-      String fileName = reader.document(hits.documentID(i))
-              .getValues(DocumentBuilder.FIELD_NAME_IDENTIFIER)[0];
-      System.out.println(hits.score(i) + ": \t" + fileName);
-
       String path = doc.get(Indexer.FIELD_PATH);
       String filename = doc.get(Indexer.FIELD_FILENAME);
-      ImageItem imageItem = new ImageItem(path, filename);
+      ImageItem imageItem = new ImageItem(path, filename, hits.score(i));
       list.add(imageItem);
     }
 

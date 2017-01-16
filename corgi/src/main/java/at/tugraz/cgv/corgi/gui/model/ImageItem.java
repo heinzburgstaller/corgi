@@ -13,10 +13,17 @@ public class ImageItem {
 
   private String imagePath;
   private String filename;
+  private Double distance;
 
   public ImageItem(String imagePath, String filename) {
     this.imagePath = imagePath;
     this.filename = filename;
+  }
+
+  public ImageItem(String imagePath, String filename, Double distance) {
+    this.imagePath = imagePath;
+    this.filename = filename;
+    this.distance = distance;
   }
 
   public String getImagePath() {
@@ -33,6 +40,18 @@ public class ImageItem {
 
   public void setFilename(String filename) {
     this.filename = filename;
+  }
+
+  public Double getDistance() {
+    return distance;
+  }
+
+  public void setDistance(Double distance) {
+    this.distance = distance;
+  }
+
+  public String getDocumentName() {
+    return "doc.txt";
   }
 
 }
