@@ -10,6 +10,7 @@ import at.tugraz.cgv.corgi.gui.model.ImageItem;
 import at.tugraz.cgv.corgi.lucene.Searcher;
 import at.tugraz.cgv.corgi.util.PropertyLoader;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
@@ -46,7 +47,7 @@ public class ImageBrowserPanel extends JPanel {
 
   public ImageBrowserPanel() {
     super(new BorderLayout());
-
+    
     navPanel = new JPanel();
     navPanel.setLayout(new BoxLayout(navPanel, BoxLayout.X_AXIS));
     navPanel.add(btnFirst);
@@ -54,6 +55,7 @@ public class ImageBrowserPanel extends JPanel {
     navPanel.add(navLabel);
     navPanel.add(btnNext);
     navPanel.add(btnLast);
+    navPanel.setBackground(new Color(112, 100, 100));
 
     searcher = new Searcher(PropertyLoader.getIndexPath() + "/images");
     try {
