@@ -21,19 +21,32 @@ import java.nio.file.attribute.BasicFileAttributes;
 import javax.imageio.ImageIO;
 import net.semanticmetadata.lire.builders.GlobalDocumentBuilder;
 import net.semanticmetadata.lire.imageanalysis.features.global.AutoColorCorrelogram;
+import net.semanticmetadata.lire.imageanalysis.features.global.BinaryPatternsPyramid;
 import net.semanticmetadata.lire.imageanalysis.features.global.CEDD;
+import net.semanticmetadata.lire.imageanalysis.features.global.ColorLayout;
+import net.semanticmetadata.lire.imageanalysis.features.global.EdgeHistogram;
 import net.semanticmetadata.lire.imageanalysis.features.global.FCTH;
-
+import net.semanticmetadata.lire.imageanalysis.features.global.Gabor;
+import net.semanticmetadata.lire.imageanalysis.features.global.JCD;
+import net.semanticmetadata.lire.imageanalysis.features.global.JpegCoefficientHistogram;
+import net.semanticmetadata.lire.imageanalysis.features.global.LocalBinaryPatterns;
+import net.semanticmetadata.lire.imageanalysis.features.global.LuminanceLayout;
+import net.semanticmetadata.lire.imageanalysis.features.global.OpponentHistogram;
+import net.semanticmetadata.lire.imageanalysis.features.global.PHOG;
+import net.semanticmetadata.lire.imageanalysis.features.global.RotationInvariantLocalBinaryPatterns;
+import net.semanticmetadata.lire.imageanalysis.features.global.ScalableColor;
+import net.semanticmetadata.lire.imageanalysis.features.global.SimpleColorHistogram;
+import net.semanticmetadata.lire.imageanalysis.features.global.Tamura;
+import net.semanticmetadata.lire.imageanalysis.features.global.joint.JointHistogram;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
-
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
@@ -47,6 +60,25 @@ public class Indexer {
   public final static String FIELD_FILETYPE = "filetype";
   public final static String FIELD_FILENAME = "filename";
   public final static String FIELD_PATH = "path";
+
+  public boolean bAUTO_COLOR_CORRELOGRAM;
+  public boolean bBINARY_PATTERNS_PYRAMID;
+  public boolean bCEDD = true;
+  public boolean bSIMPLE_COLOR_HISTOGRAM;
+  public boolean bCOLOR_LAYOUT;
+  public boolean bEDGE_HISTOGRAM;
+  public boolean bFCTH;
+  public boolean bGABOR;
+  public boolean bJCD;
+  public boolean bJOINT_HISTOGRAM;
+  public boolean bJPEG_COEFFICIENT_HISTOGRAM;
+  public boolean bLOCAL_BINARY_PATTERNS;
+  public boolean bLUMINANCE_LAYOUT;
+  public boolean bOPPONENT_HISTOGRAM;
+  public boolean bPHOG;
+  public boolean bROTATION_INVARIANT_LOCAL_BINARY_PATTERNS;
+  public boolean bSCALABLE_COLOR;
+  public boolean bTAMURA;
 
   public enum Filetype {
     TXT, IMAGE
@@ -64,8 +96,60 @@ public class Indexer {
     globalDocumentBuilder = new GlobalDocumentBuilder(CEDD.class);
 
     // and here we add those features we want to extract in a single run:
-    globalDocumentBuilder.addExtractor(FCTH.class);
-    globalDocumentBuilder.addExtractor(AutoColorCorrelogram.class);
+    if (bAUTO_COLOR_CORRELOGRAM) {
+      globalDocumentBuilder.addExtractor(AutoColorCorrelogram.class);
+    }
+    if (bBINARY_PATTERNS_PYRAMID) {
+      globalDocumentBuilder.addExtractor(BinaryPatternsPyramid.class);
+    }
+    if (bCEDD) {
+      globalDocumentBuilder.addExtractor(CEDD.class);
+    }
+    if (bSIMPLE_COLOR_HISTOGRAM) {
+      globalDocumentBuilder.addExtractor(SimpleColorHistogram.class);
+    }
+    if (bCOLOR_LAYOUT) {
+      globalDocumentBuilder.addExtractor(ColorLayout.class);
+    }
+    if (bEDGE_HISTOGRAM) {
+      globalDocumentBuilder.addExtractor(EdgeHistogram.class);
+    }
+    if (bFCTH) {
+      globalDocumentBuilder.addExtractor(FCTH.class);
+    }
+    if (bGABOR) {
+      globalDocumentBuilder.addExtractor(Gabor.class);
+    }
+    if (bJCD) {
+      globalDocumentBuilder.addExtractor(JCD.class);
+    }
+    if (bJOINT_HISTOGRAM) {
+      globalDocumentBuilder.addExtractor(JointHistogram.class);
+    }
+    if (bJPEG_COEFFICIENT_HISTOGRAM) {
+      globalDocumentBuilder.addExtractor(JpegCoefficientHistogram.class);
+    }
+    if (bLOCAL_BINARY_PATTERNS) {
+      globalDocumentBuilder.addExtractor(LocalBinaryPatterns.class);
+    }
+    if (bLUMINANCE_LAYOUT) {
+      globalDocumentBuilder.addExtractor(LuminanceLayout.class);
+    }
+    if (bOPPONENT_HISTOGRAM) {
+      globalDocumentBuilder.addExtractor(OpponentHistogram.class);
+    }
+    if (bPHOG) {
+      globalDocumentBuilder.addExtractor(PHOG.class);
+    }
+    if (bROTATION_INVARIANT_LOCAL_BINARY_PATTERNS) {
+      globalDocumentBuilder.addExtractor(RotationInvariantLocalBinaryPatterns.class);
+    }
+    if (bSCALABLE_COLOR) {
+      globalDocumentBuilder.addExtractor(ScalableColor.class);
+    }
+    if (bTAMURA) {
+      globalDocumentBuilder.addExtractor(Tamura.class);
+    }
 
     Directory dir = FSDirectory.open(Paths.get(indexPath));
     Analyzer analyzer = new StandardAnalyzer();

@@ -39,6 +39,8 @@ public class SetupPanel extends JPanel {
   private final JButton btnExtract;
   private final JButton btnIndex;
   private final JButton btnExtractAndIndex;
+  private final JButton btnChooseFeatrure = new JButton("Feature Settings");
+  private SearchPropertiePanel spp = new SearchPropertiePanel();
 
   public SetupPanel() {
     super(new BorderLayout());
@@ -81,6 +83,8 @@ public class SetupPanel extends JPanel {
 
     add(picLabel, BorderLayout.NORTH);
     add(setupPanel, BorderLayout.CENTER);
+    spp = new SearchPropertiePanel();
+    add(spp, BorderLayout.SOUTH);
 
     btnChoosePdfPath.addActionListener((e) -> {
       String path = choosePath();
@@ -116,6 +120,7 @@ public class SetupPanel extends JPanel {
       mf.setBusyCursor();
       Indexer indexer = new Indexer(tfIndexPath.getText());
       try {
+        setFeatureBoolsIndexer(indexer);
         indexer.index(tfTxtPath.getText(), true);
       } catch (IOException ex) {
         ex.printStackTrace();
@@ -131,6 +136,7 @@ public class SetupPanel extends JPanel {
       extractor.extractText(tfTxtPath.getText());
       Indexer indexer = new Indexer(tfIndexPath.getText());
       try {
+        setFeatureBoolsIndexer(indexer);
         indexer.index(tfTxtPath.getText(), true);
       } catch (IOException ex) {
         ex.printStackTrace();
@@ -140,6 +146,27 @@ public class SetupPanel extends JPanel {
     });
   }
 
+  public void setFeatureBoolsIndexer(Indexer i){
+    i.bAUTO_COLOR_CORRELOGRAM = spp.jcbautoc.isSelected();
+    i.bBINARY_PATTERNS_PYRAMID = spp.jcbbinary.isSelected();
+    i.bCEDD = spp.jcbcedd.isSelected();
+    i.bCOLOR_LAYOUT = spp.jcbcolorl.isSelected();
+    i.bEDGE_HISTOGRAM = spp.jcbedgeh.isSelected();
+    i.bFCTH = spp.jcbfcth.isSelected();
+    i.bGABOR = spp.jcbgabor.isSelected();
+    i.bJCD = spp.jcbjcd.isSelected();
+    i.bJOINT_HISTOGRAM = spp.jcbjointh.isSelected();
+    i.bJPEG_COEFFICIENT_HISTOGRAM = spp.jcbjpeg.isSelected();
+    i.bLOCAL_BINARY_PATTERNS = spp.jcblocalb.isSelected();
+    i.bLUMINANCE_LAYOUT = spp.jcbluminancel.isSelected();
+    i.bOPPONENT_HISTOGRAM = spp.jcbopponenth.isSelected();
+    i.bPHOG = spp.jcbphog.isSelected();
+    i.bROTATION_INVARIANT_LOCAL_BINARY_PATTERNS = spp.jcbrotation.isSelected();
+    i.bSCALABLE_COLOR = spp.jcbscalable.isSelected();
+    i.bSIMPLE_COLOR_HISTOGRAM = spp.jcbsimplec.isSelected();
+     i.bTAMURA = spp.jcbtamura.isSelected();
+  }
+  
   private String choosePath() {
     JFileChooser chooser = new JFileChooser();
     chooser.setCurrentDirectory(new java.io.File("."));

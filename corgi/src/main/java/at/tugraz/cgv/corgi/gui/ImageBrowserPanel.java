@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -53,6 +54,8 @@ public class ImageBrowserPanel extends JPanel implements ActionListener {
   private JButton jbsearch = new JButton("GO");
   private JButton jbcancel = new JButton("cancel");
   private boolean usedocname;
+  
+  JComboBox<String> jcbfeaturesearch;
 
   public ImageBrowserPanel() {
     super(new BorderLayout());
@@ -90,6 +93,11 @@ public class ImageBrowserPanel extends JPanel implements ActionListener {
     jbcancel.addActionListener(this);
     this.add(jpsearch, BorderLayout.NORTH);
 
+     String[] features = new String[]{"AUTO_COLOR_CORRELOGRAM", "BINARY_PATTERNS_PYRAMID", "CEDD", "SIMPLE_COLOR_HISTOGRAM", "COLOR_LAYOUT", "EDGE_HISTOGRAM,FCTH", "GABOR", "JCD", "JOINT_HISTOGRAM", "JPEG_COEFFICIENT_HISTOGRAM", "LOCAL_BINARY_PATTERNS", "LUMINANCE_LAYOUT", "OPPONENT_HISTOGRAM", "PHOG", "ROTATION_INVARIANT_LOCAL_BINARY_PATTERNS", "SCALABLE_COLOR,TAMURA"};
+
+    jcbfeaturesearch = new JComboBox<>(features);
+    jpsearch.add(jcbfeaturesearch);
+    
     this.validate();
     this.repaint();
 
@@ -122,7 +130,10 @@ public class ImageBrowserPanel extends JPanel implements ActionListener {
         MainFrame mf = (MainFrame) getTopLevelAncestor();
         searcher = new Searcher(mf.getSetupPanel().getIndexPath() + "/images");
         mf.setBusyCursor();
-        List<ImageItem> result = searcher.findSimilarImages(event.getImageItem().getImagePath());
+        ///////////////////
+        System.out.println(jcbfeaturesearch.getSelectedIndex());
+        List<ImageItem> result = searcher.findSimilarImages(event.getImageItem().getImagePath(), jcbfeaturesearch.getSelectedIndex()+1);
+        
         mf.setDefaultCursor();
 
         createFrame(result, event.getImageItem().getFilename());

@@ -18,6 +18,7 @@ import java.util.List;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
@@ -43,7 +44,6 @@ public class SearchPanel extends JPanel {
   JRadioButton rankbm25 = new JRadioButton("BM25");
   JRadioButton rankctfidf = new JRadioButton("Custom TFIDF");
   Searcher searcher;
-
   Searcher.Ranking rank = Ranking.DEFAULT;
 
   public SearchPanel() {
@@ -99,6 +99,8 @@ public class SearchPanel extends JPanel {
     btnSearch.addActionListener(a -> {
       btnSearchClicked();
     });
+
+   
   }
 
   private void btnSearchClicked() {

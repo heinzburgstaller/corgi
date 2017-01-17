@@ -13,7 +13,25 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import javax.imageio.ImageIO;
+import net.semanticmetadata.lire.imageanalysis.features.GlobalFeature;
+import net.semanticmetadata.lire.imageanalysis.features.global.AutoColorCorrelogram;
+import net.semanticmetadata.lire.imageanalysis.features.global.BinaryPatternsPyramid;
 import net.semanticmetadata.lire.imageanalysis.features.global.CEDD;
+import net.semanticmetadata.lire.imageanalysis.features.global.ColorLayout;
+import net.semanticmetadata.lire.imageanalysis.features.global.EdgeHistogram;
+import net.semanticmetadata.lire.imageanalysis.features.global.FCTH;
+import net.semanticmetadata.lire.imageanalysis.features.global.Gabor;
+import net.semanticmetadata.lire.imageanalysis.features.global.JCD;
+import net.semanticmetadata.lire.imageanalysis.features.global.JpegCoefficientHistogram;
+import net.semanticmetadata.lire.imageanalysis.features.global.LocalBinaryPatterns;
+import net.semanticmetadata.lire.imageanalysis.features.global.LuminanceLayout;
+import net.semanticmetadata.lire.imageanalysis.features.global.OpponentHistogram;
+import net.semanticmetadata.lire.imageanalysis.features.global.PHOG;
+import net.semanticmetadata.lire.imageanalysis.features.global.RotationInvariantLocalBinaryPatterns;
+import net.semanticmetadata.lire.imageanalysis.features.global.ScalableColor;
+import net.semanticmetadata.lire.imageanalysis.features.global.SimpleColorHistogram;
+import net.semanticmetadata.lire.imageanalysis.features.global.Tamura;
+import net.semanticmetadata.lire.imageanalysis.features.global.joint.JointHistogram;
 import net.semanticmetadata.lire.searchers.GenericFastImageSearcher;
 import net.semanticmetadata.lire.searchers.ImageSearchHits;
 import net.semanticmetadata.lire.searchers.ImageSearcher;
@@ -39,6 +57,25 @@ public class Searcher {
   private final String indexPath;
   private Ranking ranking = Ranking.DEFAULT;
 
+  public boolean bAUTO_COLOR_CORRELOGRAM;
+  public boolean bBINARY_PATTERNS_PYRAMID;
+  public boolean bCEDD = true;
+  public boolean bSIMPLE_COLOR_HISTOGRAM;
+  public boolean bCOLOR_LAYOUT;
+  public boolean bEDGE_HISTOGRAM;
+  public boolean bFCTH;
+  public boolean bGABOR;
+  public boolean bJCD;
+  public boolean bJOINT_HISTOGRAM;
+  public boolean bJPEG_COEFFICIENT_HISTOGRAM;
+  public boolean bLOCAL_BINARY_PATTERNS;
+  public boolean bLUMINANCE_LAYOUT;
+  public boolean bOPPONENT_HISTOGRAM;
+  public boolean bPHOG;
+  public boolean bROTATION_INVARIANT_LOCAL_BINARY_PATTERNS;
+  public boolean bSCALABLE_COLOR;
+  public boolean bTAMURA;
+
   public Searcher(String indexPath) {
     this.indexPath = indexPath;
     this.ranking = Ranking.DEFAULT;
@@ -57,10 +94,72 @@ public class Searcher {
     ranking = rank;
   }
 
-  public List<ImageItem> findSimilarImages(String imagePath) throws IOException {
+  public List<ImageItem> findSimilarImages(String imagePath, int featurenumber) throws IOException {
     List<ImageItem> list = new ArrayList<>();
     IndexReader reader = DirectoryReader.open(FSDirectory.open(Paths.get(indexPath)));
-    ImageSearcher searcher = new GenericFastImageSearcher(30, CEDD.class);
+    GenericFastImageSearcher g;
+    Object feature = CEDD.class;
+    if (featurenumber != 0) {
+      if (featurenumber == 1) {
+        feature = AutoColorCorrelogram.class;
+      }
+      if (featurenumber == 2) {
+        feature = BinaryPatternsPyramid.class;
+      }
+      if (featurenumber == 3) {
+        feature = CEDD.class;
+      }
+      if (featurenumber == 4) {
+        feature = SimpleColorHistogram.class;
+      }
+      if (featurenumber == 5) {
+        feature = ColorLayout.class;
+      }
+      if (featurenumber == 6) {
+        feature = EdgeHistogram.class;
+      }
+      if (featurenumber == 7) {
+        feature = FCTH.class;
+      }
+      if (featurenumber == 8) {
+        feature = Gabor.class;
+      }
+      if (featurenumber == 9) {
+        feature = JCD.class;
+      }
+      if (featurenumber == 10) {
+        feature = JointHistogram.class;
+      }
+      if (featurenumber == 11) {
+        feature = JpegCoefficientHistogram.class;
+      }
+      if (featurenumber == 12) {
+        feature = LocalBinaryPatterns.class;
+      }
+      if (featurenumber == 13) {
+        feature = LuminanceLayout.class;
+      }
+      if (featurenumber == 14) {
+        feature = OpponentHistogram.class;
+      }
+      if (featurenumber == 15) {
+        feature = PHOG.class;
+      }
+      if (featurenumber == 16) {
+        feature = RotationInvariantLocalBinaryPatterns.class;
+      }
+      if (featurenumber == 17) {
+        feature = ScalableColor.class;
+      }
+      if (featurenumber == 18) {
+        feature = Tamura.class;
+      }
+    }
+
+    g = new GenericFastImageSearcher(30, (Class<? extends GlobalFeature>) feature);
+    ImageSearcher searcher = g;
+    //ImageSearcher searcher = new GenericFastImageSearcher(2, JCD.class);
+
     BufferedImage img = null;
     File f = new File(imagePath);
     if (f.exists()) {
@@ -101,6 +200,27 @@ public class Searcher {
     }
 
     return list;
+  }
+
+  private void setAllFeaturesFalse() {
+    bAUTO_COLOR_CORRELOGRAM = false;
+    bBINARY_PATTERNS_PYRAMID = false;
+    bCEDD = false;
+    bSIMPLE_COLOR_HISTOGRAM = false;
+    bCOLOR_LAYOUT = false;
+    bEDGE_HISTOGRAM = false;
+    bFCTH = false;
+    bGABOR = false;
+    bJCD = false;
+    bJOINT_HISTOGRAM = false;
+    bJPEG_COEFFICIENT_HISTOGRAM = false;
+    bLOCAL_BINARY_PATTERNS = false;
+    bLUMINANCE_LAYOUT = false;
+    bOPPONENT_HISTOGRAM = false;
+    bPHOG = false;
+    bROTATION_INVARIANT_LOCAL_BINARY_PATTERNS = false;
+    bSCALABLE_COLOR = false;
+    bTAMURA = false;
   }
 
   public List<SearchHit> search(String queryString) throws IOException, ParseException {
