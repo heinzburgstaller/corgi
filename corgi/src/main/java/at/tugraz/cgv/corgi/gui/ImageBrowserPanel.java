@@ -12,7 +12,9 @@ import at.tugraz.cgv.corgi.util.PropertyLoader;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +24,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 import org.apache.lucene.index.IndexNotFoundException;
 import org.apache.lucene.queryparser.classic.ParseException;
 
@@ -29,7 +32,7 @@ import org.apache.lucene.queryparser.classic.ParseException;
  *
  * @author heinz
  */
-public class ImageBrowserPanel extends JPanel {
+public class ImageBrowserPanel extends JPanel implements ActionListener {
 
   private static final int IMAGES_PER_PAGE = 16;
   private int currentPage = 0;
@@ -37,17 +40,21 @@ public class ImageBrowserPanel extends JPanel {
 
   private JPanel navPanel;
   private List<ImageItem> images = new ArrayList<>();
-  private final ImageBrowser imageBrowser;
+  private ImageBrowser imageBrowser;
   Searcher searcher;
   private JButton btnFirst = new JButton("<<");
   private JButton btnLast = new JButton(">>");
   private JButton btnNext = new JButton(">");
   private JButton btnPrevious = new JButton("<");
   private JLabel navLabel = new JLabel();
+  private JPanel jpsearch = new JPanel();
+  private JLabel jlsearch = new JLabel("Document: ");
+  private JTextField jtfsearch = new JTextField("", 30);
+  private JButton jbsearch = new JButton("GO");
 
   public ImageBrowserPanel() {
     super(new BorderLayout());
-    
+
     navPanel = new JPanel();
     navPanel.setLayout(new BoxLayout(navPanel, BoxLayout.X_AXIS));
     navPanel.add(btnFirst);
@@ -68,9 +75,16 @@ public class ImageBrowserPanel extends JPanel {
     }
 
     imageBrowser = new ImageBrowser();
-    navigate();
+    navigate(false);
     add(new JScrollPane(imageBrowser), BorderLayout.CENTER);
     add(navPanel, BorderLayout.SOUTH);
+
+    jpsearch.setLayout(new FlowLayout());
+    jpsearch.add(jlsearch);
+    jpsearch.add(jtfsearch);
+    jpsearch.add(jbsearch);
+    jbsearch.addActionListener(this);
+    this.add(jpsearch, BorderLayout.NORTH);
 
     this.validate();
     this.repaint();
@@ -78,25 +92,25 @@ public class ImageBrowserPanel extends JPanel {
     btnNext.addActionListener((ActionEvent e) -> {
       if (currentPage < maxPages) {
         currentPage++;
-        navigate();
+        navigate(false);
       }
     });
 
     btnPrevious.addActionListener((ActionEvent e) -> {
       if (currentPage > 0) {
         currentPage--;
-        navigate();
+        navigate(false);
       }
     });
 
     btnFirst.addActionListener((ActionEvent e) -> {
       currentPage = 0;
-      navigate();
+      navigate(false);
     });
 
     btnLast.addActionListener((ActionEvent e) -> {
       currentPage = maxPages;
-      navigate();
+      navigate(false);
     });
 
     imageBrowser.addImageSelectListener((ImageSelectEvent event) -> {
@@ -114,13 +128,28 @@ public class ImageBrowserPanel extends JPanel {
     });
   }
 
-  private void navigate() {
+  private void navigate(boolean usedocname) {
     int from = currentPage * IMAGES_PER_PAGE;
     int to = currentPage * IMAGES_PER_PAGE + IMAGES_PER_PAGE;
     if (to > images.size()) {
       to = images.size();
     }
-    imageBrowser.addImages(images.subList(from, to));
+    if (!usedocname) {
+      imageBrowser.addImages(images.subList(from, to));
+    } else {
+      List<ImageItem> sublist = new ArrayList<>();
+      for (ImageItem item : images) {
+        if (item.getDocumentName().contains(jtfsearch.getText())) {
+          sublist.add(item);
+        }
+      }
+      from = currentPage * IMAGES_PER_PAGE;
+      to = currentPage * IMAGES_PER_PAGE + IMAGES_PER_PAGE;
+      if (to > sublist.size()) {
+        to = sublist.size();
+      }
+      imageBrowser.addImages(sublist.subList(from, to));
+    }
     navLabel.setText("  Page " + (currentPage + 1) + " of " + (maxPages + 1) + "  ");
   }
 
@@ -140,5 +169,12 @@ public class ImageBrowserPanel extends JPanel {
       frame.validate();
       frame.repaint();
     });
+  }
+
+  @Override
+  public void actionPerformed(ActionEvent e) {
+    if (e.getSource().equals((jbsearch))) {
+      this.navigate(true);
+    }
   }
 }
