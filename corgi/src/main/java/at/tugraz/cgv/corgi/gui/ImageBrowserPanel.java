@@ -51,6 +51,8 @@ public class ImageBrowserPanel extends JPanel implements ActionListener {
   private JLabel jlsearch = new JLabel("Document: ");
   private JTextField jtfsearch = new JTextField("", 30);
   private JButton jbsearch = new JButton("GO");
+  private JButton jbcancel = new JButton("cancel");
+  private boolean usedocname;
 
   public ImageBrowserPanel() {
     super(new BorderLayout());
@@ -75,7 +77,7 @@ public class ImageBrowserPanel extends JPanel implements ActionListener {
     }
 
     imageBrowser = new ImageBrowser();
-    navigate(false);
+    navigate();
     add(new JScrollPane(imageBrowser), BorderLayout.CENTER);
     add(navPanel, BorderLayout.SOUTH);
 
@@ -83,7 +85,9 @@ public class ImageBrowserPanel extends JPanel implements ActionListener {
     jpsearch.add(jlsearch);
     jpsearch.add(jtfsearch);
     jpsearch.add(jbsearch);
+    jpsearch.add(jbcancel);
     jbsearch.addActionListener(this);
+    jbcancel.addActionListener(this);
     this.add(jpsearch, BorderLayout.NORTH);
 
     this.validate();
@@ -92,25 +96,25 @@ public class ImageBrowserPanel extends JPanel implements ActionListener {
     btnNext.addActionListener((ActionEvent e) -> {
       if (currentPage < maxPages) {
         currentPage++;
-        navigate(false);
+        navigate();
       }
     });
 
     btnPrevious.addActionListener((ActionEvent e) -> {
       if (currentPage > 0) {
         currentPage--;
-        navigate(false);
+        navigate();
       }
     });
 
     btnFirst.addActionListener((ActionEvent e) -> {
       currentPage = 0;
-      navigate(false);
+      navigate();
     });
 
     btnLast.addActionListener((ActionEvent e) -> {
       currentPage = maxPages;
-      navigate(false);
+      navigate();
     });
 
     imageBrowser.addImageSelectListener((ImageSelectEvent event) -> {
@@ -128,7 +132,7 @@ public class ImageBrowserPanel extends JPanel implements ActionListener {
     });
   }
 
-  private void navigate(boolean usedocname) {
+  private void navigate() {
     int from = currentPage * IMAGES_PER_PAGE;
     int to = currentPage * IMAGES_PER_PAGE + IMAGES_PER_PAGE;
     if (to > images.size()) {
@@ -174,7 +178,12 @@ public class ImageBrowserPanel extends JPanel implements ActionListener {
   @Override
   public void actionPerformed(ActionEvent e) {
     if (e.getSource().equals((jbsearch))) {
-      this.navigate(true);
+      usedocname = true;
+      this.navigate();
+    }
+    if(e.getSource().equals(jbcancel)){
+      usedocname = false;
+      this.navigate();
     }
   }
 }
