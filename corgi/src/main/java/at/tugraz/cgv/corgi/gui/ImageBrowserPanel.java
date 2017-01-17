@@ -121,7 +121,7 @@ public class ImageBrowserPanel extends JPanel implements ActionListener {
         List<ImageItem> result = searcher.findSimilarImages(event.getImageItem().getImagePath());
         mf.setDefaultCursor();
 
-        createFrame(result);
+        createFrame(result, event.getImageItem().getFilename());
       } catch (IOException ex) {
         throw new RuntimeException(ex);
       }
@@ -153,9 +153,9 @@ public class ImageBrowserPanel extends JPanel implements ActionListener {
     navLabel.setText("  Page " + (currentPage + 1) + " of " + (maxPages + 1) + "  ");
   }
 
-  public static void createFrame(List<ImageItem> result) {
+  public static void createFrame(List<ImageItem> result, String imageName) {
     EventQueue.invokeLater(() -> {
-      JFrame frame = new JFrame("Test");
+      JFrame frame = new JFrame("Search results for: " + imageName);
       frame.setSize(800, 600);
       frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
       frame.setLocationRelativeTo(null);
