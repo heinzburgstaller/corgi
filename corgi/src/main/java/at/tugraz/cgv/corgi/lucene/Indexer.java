@@ -7,6 +7,7 @@ package at.tugraz.cgv.corgi.lucene;
 
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,6 +39,7 @@ import net.semanticmetadata.lire.imageanalysis.features.global.ScalableColor;
 import net.semanticmetadata.lire.imageanalysis.features.global.SimpleColorHistogram;
 import net.semanticmetadata.lire.imageanalysis.features.global.Tamura;
 import net.semanticmetadata.lire.imageanalysis.features.global.joint.JointHistogram;
+import org.apache.commons.io.FileUtils;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -56,11 +58,11 @@ import org.apache.lucene.store.FSDirectory;
  * @author heinz
  */
 public class Indexer {
-
+  
   public final static String FIELD_FILETYPE = "filetype";
   public final static String FIELD_FILENAME = "filename";
   public final static String FIELD_PATH = "path";
-
+  
   public boolean bAUTO_COLOR_CORRELOGRAM;
   public boolean bBINARY_PATTERNS_PYRAMID;
   public boolean bCEDD = true;
@@ -79,19 +81,22 @@ public class Indexer {
   public boolean bROTATION_INVARIANT_LOCAL_BINARY_PATTERNS;
   public boolean bSCALABLE_COLOR;
   public boolean bTAMURA;
-
+  
   public enum Filetype {
     TXT, IMAGE
   };
-
+  
   private final String indexPath;
   private GlobalDocumentBuilder globalDocumentBuilder;
-
+  
   public Indexer(String indexPath) {
     this.indexPath = indexPath;
   }
-
+  
   public void index(String txtPath, boolean create) throws IOException {
+    //Delete
+    FileUtils.deleteDirectory(new File(indexPath));
+
     // Creating a CEDD document builder and indexing all files.
     globalDocumentBuilder = new GlobalDocumentBuilder(CEDD.class);
 
@@ -151,11 +156,11 @@ public class Indexer {
     if (bTAMURA) {
       globalDocumentBuilder.addExtractor(Tamura.class);
     }
-
+    
     Directory dir = FSDirectory.open(Paths.get(indexPath));
     Analyzer analyzer = new StandardAnalyzer();
     IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
-
+    
     if (create) {
       // Create a new index in the directory, removing any
       // previously indexed documents:
@@ -164,22 +169,22 @@ public class Indexer {
       // Add new documents to an existing index:
       iwc.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
     }
-
+    
     try (IndexWriter writer = new IndexWriter(dir, iwc)) {
       indexDocs(writer, Paths.get(txtPath));
     }
-
+    
     Directory dirImages = FSDirectory.open(Paths.get(indexPath + "/images"));
     Analyzer analyzerImages = new StandardAnalyzer();
     IndexWriterConfig iwcImages = new IndexWriterConfig(analyzerImages);
-
+    
     try (IndexWriter writer = new IndexWriter(dirImages, iwcImages)) {
       indexImages(writer, Paths.get(txtPath));
     }
-
+    
     System.out.println("Indexing done!");
   }
-
+  
   private void indexImages(final IndexWriter writer, Path path) throws IOException {
     if (Files.isDirectory(path)) {
       Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
@@ -236,13 +241,13 @@ public class Indexer {
       }
     }
   }
-
+  
   private void indexImage(IndexWriter writer, Path file, long lastModified) {
     if (file.toFile().length() == 0) {
       System.out.println("Indexing image: " + file.toString() + ", is empty -> ignore");
       return;
     }
-
+    
     System.out.println("Indexing image: " + file.toString());
     try {
       BufferedImage img = ImageIO.read(new FileInputStream(file.toString()));
@@ -267,7 +272,7 @@ public class Indexer {
     try (InputStream stream = Files.newInputStream(file)) {
       // make a new, empty document
       Document doc = new Document();
-
+      
       Field filename = new StringField(FIELD_FILENAME, file.toFile().getName(), Field.Store.YES);
       doc.add(filename);
       Field pathField = new StringField(FIELD_PATH, file.toString(), Field.Store.YES);
@@ -288,7 +293,7 @@ public class Indexer {
       // Note that FileReader expects the file to be in UTF-8 encoding.
       // If that's not the case searching for special characters will fail.
       doc.add(new TextField("contents", new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))));
-
+      
       if (writer.getConfig().getOpenMode() == OpenMode.CREATE) {
         // New index, so we just add the document (no old document can be there):
         System.out.println("adding " + file);
@@ -302,5 +307,5 @@ public class Indexer {
       }
     }
   }
-
+  
 }
