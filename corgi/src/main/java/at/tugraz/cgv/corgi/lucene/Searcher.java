@@ -10,6 +10,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.List;
 import javax.imageio.ImageIO;
@@ -116,6 +117,7 @@ public class Searcher {
         feature = ColorLayout.class;
       }
       if (featurenumber == 6) {
+        System.out.println("EDGE HISTO");
         feature = EdgeHistogram.class;
       }
       if (featurenumber == 7) {
