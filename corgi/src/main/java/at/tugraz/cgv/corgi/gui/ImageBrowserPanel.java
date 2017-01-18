@@ -54,7 +54,7 @@ public class ImageBrowserPanel extends JPanel implements ActionListener {
   private JButton jbsearch = new JButton("GO");
   private JButton jbcancel = new JButton("cancel");
   private boolean usedocname;
-  
+
   JComboBox<String> jcbfeaturesearch;
 
   public ImageBrowserPanel() {
@@ -69,15 +69,7 @@ public class ImageBrowserPanel extends JPanel implements ActionListener {
     navPanel.add(btnLast);
     navPanel.setBackground(new Color(112, 100, 100));
 
-    searcher = new Searcher(PropertyLoader.getIndexPath() + "/images");
-    try {
-      images = searcher.findAllImages();
-      maxPages = images.size() / IMAGES_PER_PAGE;
-    } catch (IndexNotFoundException ine) {
-      System.out.println(ine.toString());
-    } catch (IOException | ParseException ex) {
-      throw new RuntimeException(ex);
-    }
+    search(PropertyLoader.getIndexPath());
 
     imageBrowser = new ImageBrowser();
     navigate();
@@ -93,11 +85,11 @@ public class ImageBrowserPanel extends JPanel implements ActionListener {
     jbcancel.addActionListener(this);
     this.add(jpsearch, BorderLayout.NORTH);
 
-     String[] features = new String[]{"AUTO_COLOR_CORRELOGRAM", "BINARY_PATTERNS_PYRAMID", "CEDD", "SIMPLE_COLOR_HISTOGRAM", "COLOR_LAYOUT", "EDGE_HISTOGRAM,FCTH", "GABOR", "JCD", "JOINT_HISTOGRAM", "JPEG_COEFFICIENT_HISTOGRAM", "LOCAL_BINARY_PATTERNS", "LUMINANCE_LAYOUT", "OPPONENT_HISTOGRAM", "PHOG", "ROTATION_INVARIANT_LOCAL_BINARY_PATTERNS", "SCALABLE_COLOR,TAMURA"};
+    String[] features = new String[]{"AUTO_COLOR_CORRELOGRAM", "BINARY_PATTERNS_PYRAMID", "CEDD", "SIMPLE_COLOR_HISTOGRAM", "COLOR_LAYOUT", "EDGE_HISTOGRAM,FCTH", "GABOR", "JCD", "JOINT_HISTOGRAM", "JPEG_COEFFICIENT_HISTOGRAM", "LOCAL_BINARY_PATTERNS", "LUMINANCE_LAYOUT", "OPPONENT_HISTOGRAM", "PHOG", "ROTATION_INVARIANT_LOCAL_BINARY_PATTERNS", "SCALABLE_COLOR,TAMURA"};
 
     jcbfeaturesearch = new JComboBox<>(features);
     jpsearch.add(jcbfeaturesearch);
-    
+
     this.validate();
     this.repaint();
 
@@ -132,8 +124,8 @@ public class ImageBrowserPanel extends JPanel implements ActionListener {
         mf.setBusyCursor();
         ///////////////////
         System.out.println(jcbfeaturesearch.getSelectedIndex());
-        List<ImageItem> result = searcher.findSimilarImages(event.getImageItem().getImagePath(), jcbfeaturesearch.getSelectedIndex()+1);
-        
+        List<ImageItem> result = searcher.findSimilarImages(event.getImageItem().getImagePath(), jcbfeaturesearch.getSelectedIndex() + 1);
+
         mf.setDefaultCursor();
 
         createFrame(result, event.getImageItem().getFilename());
@@ -141,6 +133,25 @@ public class ImageBrowserPanel extends JPanel implements ActionListener {
         throw new RuntimeException(ex);
       }
     });
+  }
+
+  public void reset() {
+    MainFrame mf = (MainFrame) getTopLevelAncestor();
+    search(mf.getSetupPanel().getIndexPath());
+    currentPage = 0;
+    navigate();
+  }
+
+  private void search(String indexPath) {
+    searcher = new Searcher(indexPath + "/images");
+    try {
+      images = searcher.findAllImages();
+      maxPages = images.size() / IMAGES_PER_PAGE;
+    } catch (IndexNotFoundException ine) {
+      System.out.println(ine.toString());
+    } catch (IOException | ParseException ex) {
+      throw new RuntimeException(ex);
+    }
   }
 
   private void navigate() {
@@ -192,7 +203,7 @@ public class ImageBrowserPanel extends JPanel implements ActionListener {
       usedocname = true;
       this.navigate();
     }
-    if(e.getSource().equals(jbcancel)){
+    if (e.getSource().equals(jbcancel)) {
       usedocname = false;
       this.navigate();
     }
