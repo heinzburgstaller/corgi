@@ -122,6 +122,7 @@ public class SetupPanel extends JPanel {
       try {
         setFeatureBoolsIndexer(indexer);
         indexer.index(tfTxtPath.getText(), true);
+        mf.getImageBrowserPanel().reset();
       } catch (IOException ex) {
         ex.printStackTrace();
       } finally {
@@ -138,6 +139,7 @@ public class SetupPanel extends JPanel {
       try {
         setFeatureBoolsIndexer(indexer);
         indexer.index(tfTxtPath.getText(), true);
+        mf.getImageBrowserPanel().reset();
       } catch (IOException ex) {
         ex.printStackTrace();
       } finally {
@@ -146,7 +148,7 @@ public class SetupPanel extends JPanel {
     });
   }
 
-  public void setFeatureBoolsIndexer(Indexer i){
+  public void setFeatureBoolsIndexer(Indexer i) {
     i.bAUTO_COLOR_CORRELOGRAM = spp.jcbautoc.isSelected();
     i.bBINARY_PATTERNS_PYRAMID = spp.jcbbinary.isSelected();
     i.bCEDD = spp.jcbcedd.isSelected();
@@ -164,9 +166,9 @@ public class SetupPanel extends JPanel {
     i.bROTATION_INVARIANT_LOCAL_BINARY_PATTERNS = spp.jcbrotation.isSelected();
     i.bSCALABLE_COLOR = spp.jcbscalable.isSelected();
     i.bSIMPLE_COLOR_HISTOGRAM = spp.jcbsimplec.isSelected();
-     i.bTAMURA = spp.jcbtamura.isSelected();
+    i.bTAMURA = spp.jcbtamura.isSelected();
   }
-  
+
   private String choosePath() {
     JFileChooser chooser = new JFileChooser();
     chooser.setCurrentDirectory(new java.io.File("."));

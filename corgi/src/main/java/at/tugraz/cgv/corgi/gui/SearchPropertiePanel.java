@@ -6,7 +6,6 @@
 package at.tugraz.cgv.corgi.gui;
 
 import java.awt.GridLayout;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 
@@ -34,7 +33,6 @@ public class SearchPropertiePanel extends JPanel {
   JCheckBox jcbrotation = new JCheckBox("ROTATION_INVARIANT_LOCAL_BINARY_PATTERNS");
   JCheckBox jcbscalable = new JCheckBox("SCALABLE_COLOR");
   JCheckBox jcbtamura = new JCheckBox("TAMURA");
-  JButton jbok = new JButton("confirm");
 
   public SearchPropertiePanel() {
     this.setLayout(new GridLayout(3, 0));
@@ -56,7 +54,6 @@ public class SearchPropertiePanel extends JPanel {
     this.add(jcbrotation);
     this.add(jcbscalable);
     this.add(jcbtamura);
-    this.add(jbok);
     this.setVisible(true);
   }
 

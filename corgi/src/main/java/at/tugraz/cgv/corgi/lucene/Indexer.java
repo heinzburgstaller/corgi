@@ -112,6 +112,7 @@ public class Indexer {
       globalDocumentBuilder.addExtractor(ColorLayout.class);
     }
     if (bEDGE_HISTOGRAM) {
+      System.out.println("EDGE INDEX");
       globalDocumentBuilder.addExtractor(EdgeHistogram.class);
     }
     if (bFCTH) {

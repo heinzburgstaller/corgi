@@ -38,7 +38,7 @@ public class MainFrame extends JFrame {
 
   private void initUI() {
     setTitle("Corgi GUI");
-    setSize(600, 610);
+    setSize(900, 630);
     setLocationRelativeTo(null);
     setDefaultCloseOperation(EXIT_ON_CLOSE);
   }
@@ -57,6 +57,10 @@ public class MainFrame extends JFrame {
 
   public SearchPanel getSearchPanel() {
     return searchPanel;
+  }
+
+  public ImageBrowserPanel getImageBrowserPanel() {
+    return imageBrowserPanel;
   }
 
 }
