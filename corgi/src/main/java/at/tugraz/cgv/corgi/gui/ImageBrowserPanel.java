@@ -184,7 +184,7 @@ public class ImageBrowserPanel extends JPanel implements ActionListener {
   public static void createFrame(List<ImageItem> result, String imageName) {
     EventQueue.invokeLater(() -> {
       JFrame frame = new JFrame("Search results for: " + imageName);
-      frame.setSize(800, 600);
+      frame.setSize(850, 600);
       frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
       frame.setLocationRelativeTo(null);
 
